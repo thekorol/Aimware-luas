@@ -243,7 +243,7 @@ if OnlyHeadKey:GetValue() == 0 then return end
     if(input.IsButtonPressed(OnlyHeadKey:GetValue())) then
             head = head + 1;
     elseif(input.IsButtonDown) then
-    -- do nothing
+    -- do nothing --
     end
     if(input.IsButtonReleased(OnlyHeadKey:GetValue())) then
             if (head%2 == 0) then
