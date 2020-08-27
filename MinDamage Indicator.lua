@@ -2,12 +2,12 @@ x,y = draw.GetScreenSize();
 FONT = draw.CreateFont("Microsoft Tai Le","22", 2000 )
 
 callbacks.Register("Draw", function()
+    
+local lp = entities.GetLocalPlayer()
+local wid = lp:GetWeaponID()
 
 if not lp then return end
 if not lp:IsAlive() then return end
-
-local lp = entities.GetLocalPlayer()
-local wid = lp:GetWeaponID()
 
 draw.SetFont( FONT );
 
