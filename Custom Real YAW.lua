@@ -46,7 +46,7 @@ elseif yawtype:GetValue() == 4 then
         iswitch = yawminimal:GetValue() end
 
 elseif yawtype:GetValue() == 5 then 
-gui.SetValue("rbot.antiaim.yaw", math.random(yawminimal:GetValue(), yawmaximal:GetValue()))
+        gui.SetValue("rbot.antiaim.yaw", math.random(yawminimal:GetValue(), yawmaximal:GetValue()))
 
 end
 end
