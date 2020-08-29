@@ -7,14 +7,17 @@ callbacks.Register("Draw", function()
     local lp = entities.GetLocalPlayer();
     local playerResources = entities.GetPlayerResources();
 
+    -- do not edit above
+
     local divider = ' | ';
     local cheatName = 'AIMWARE.net ';
- local indexlp = client.GetLocalPlayerIndex()
+	local indexlp = client.GetLocalPlayerIndex()
     local userName = client.GetPlayerNameByIndex(indexlp);
-
+    
+	-- Do not edit below
     local delay;
     local tick;
- local fps = 'FPS: ';
+	local fps = 'FPS: ';
   
 local frame_rate = 0/10
 local get_abs_fps = function()
@@ -40,17 +43,19 @@ end
     local watermarkWidth = weightPadding + w;
     local start_x, start_y = draw.GetScreenSize();
     start_x, start_y = start_x - watermarkWidth - 20, start_y * 0.0225;
-    draw.Color(0, 0, 0, 100);
+	draw.Color(0, 0, 0, 100);
     draw.FilledRect(start_x-25, start_y, start_x + watermarkWidth , start_y + h + heightPadding);
     draw.Color(255,255,255,255);
-    draw.Text(start_x + weightPadding / 2-25, start_y + heightPadding / 2, watermarkText .. get_abs_fps()/10)
+    draw.Text(start_x + weightPadding / 2-25, start_y + heightPadding / 2 + 1, watermarkText .. get_abs_fps()/10)
+	draw.Color(200, 40, 40, 255);
+	draw.FilledRect(start_x-25, start_y, start_x + watermarkWidth , start_y +2);
 end)
 
 ------------------------------------------------------------
 --DrawUI
 ------------------------------------------------------------
 function DrawUI()
- watermark = gui.Checkbox(gui.Reference("Misc","General","Extra"),"watermark","Show Watermark",0);
- watermark:SetDescription("Shows watermark AIMWARE.net.");
+	watermark = gui.Checkbox(gui.Reference("Misc","General","Extra"),"watermark","Show Watermark",0);
+	watermark:SetDescription("Shows watermark AIMWARE.net.");
 end
 DrawUI();
