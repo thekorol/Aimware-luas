@@ -43,7 +43,7 @@ local function getKeybinds()
     hLocalPlayer = entities.GetLocalPlayer();
     wid = hLocalPlayer:GetWeaponID()
 ---------------------------
-if gui.GetValue("lbot.master") and input.IsButtonDown(gui.GetValue("lbot.trg.key")) then
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.trg.key") ~= 0 and input.IsButtonDown(gui.GetValue("lbot.trg.key")) then
     Keybinds[i] = 'Triggerbot';
         i = i + 1;
     end
@@ -86,7 +86,7 @@ elseif gui.GetValue("rbot.master") and (wid == 25 or wid == 27 or wid == 29 or w
     Keybinds[i] = 'Slowwalk';
         i = i + 1;
     end
-if gui.GetValue("rbot.master") and (gui.GetValue("rbot.antiaim.fakeyawstyle") == 2 or gui.GetValue("rbot.antiaim.fakeyawstyle") == 4) then
+if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.base.rotation") > 1 then
     Keybinds[i] = 'Anti-Aim Inverted';
         i = i + 1;
     end
@@ -94,7 +94,7 @@ if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.extra.fakecrouchke
     Keybinds[i] = 'Fake Duck';
         i = i + 1;
     end
-if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.extra.shiftonshot") then
+if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.condition.shiftonshot") then
     Keybinds[i] = 'Hide Shots';
         i = i + 1;
     end
