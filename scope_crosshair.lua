@@ -17,7 +17,7 @@ function crosshair()
 
     hLocalPlayer = entities.GetLocalPlayer();
     is_scope = hLocalPlayer:GetPropBool("m_bIsScoped");
-	
+    if not hLocalPlayer then return end 
     if is_scope and enbl then
         x,y = draw.GetScreenSize();
 
