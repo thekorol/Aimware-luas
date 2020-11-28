@@ -23,7 +23,7 @@ function crosshair()
 
         client.SetConVar("cl_drawhud", "0",true);
         gui.SetValue("esp.other.noscopeoverlay",false);
-		gui.SetValue("esp.other.crosshair",false);
+	gui.SetValue("esp.other.crosshair",false);
 		
         gradientH(x/2,y/2,x/2+lngth,y/2-thcknss,{ clr1,clr2,clr3,clr4 }, true);
         gradientH(x/2-lngth,y/2,x/2,y/2-thcknss,{ clr1,clr2,clr3,clr4 }, false);
@@ -31,6 +31,7 @@ function crosshair()
 	    gradientV(x/2,y/2,thcknss,lngth,{ 255, 255, 255,0 },{ clr1,clr2,clr3,clr4 },false);
     else
         client.SetConVar("cl_drawhud", "1",true);
+	gui.SetValue("esp.other.noscopeoverlay",true);
     end
 end
 
