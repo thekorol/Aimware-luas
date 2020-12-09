@@ -22,6 +22,7 @@ local base64 = {
 local FIcon = draw.AddFontResource(decodeB64(base64.fontIcon));
 local FontIcon = draw.CreateFont("aimware_thekorol", 13)
 local FontDefault = draw.CreateFont("Calibri Bold", 13)
+local x,y = draw.GetScreenSize();
 
 function gradientH(x1, y1, x2, y2,col1, left)
     local w = x2 - x1
@@ -78,7 +79,7 @@ if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.extra.fakecrouchke
         i = i + 1;
     end
 if gui.GetValue("rbot.master") and gui.GetValue("rbot.antiaim.condition.shiftonshot") then
-    Keybinds[i] = 'Hide Shots';
+    Keybinds[i] = 'Hideshots';
         i = i + 1;
     end
 if gui.GetValue("esp.master") and gui.GetValue("esp.local.thirdperson") then
@@ -153,7 +154,6 @@ end
 
 callbacks.Register("Draw", function()
 if not entities.GetLocalPlayer() or not entities.GetLocalPlayer():IsAlive() then return end
-    local x,y = draw.GetScreenSize();
     gradientH(0,y/2+6,150,y/2-6,{ 0,0,0,220 }, false);
     local Keybinds = getKeybinds();
     drawkeybinds(Keybinds);	
