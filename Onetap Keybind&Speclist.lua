@@ -133,7 +133,6 @@ end
 
 local function drawkeybinds(Keybinds)
     for index in pairs(Keybinds) do
-
         draw.Color(255, 255, 255, 255);
 		draw.SetFont(FontDefault);
         draw.Text(20,y/2 + (index * 15), Keybinds[index])
@@ -154,7 +153,7 @@ end
 
 callbacks.Register("Draw", function()
 if not entities.GetLocalPlayer() or not entities.GetLocalPlayer():IsAlive() then return end
-    gradientH(0,y/2+6,150,y/2-6,{ 0,0,0,220 }, false);
+    gradientH(0,y/2+6,150,y/2-6,{ 0,0,0,200 }, false);
     local Keybinds = getKeybinds();
     drawkeybinds(Keybinds);	
     local spectators = getspectators();
