@@ -25,7 +25,6 @@ local FontDefault = draw.CreateFont("Verdana", 13)
 
 local defusing = false;
 local plantedat = 0;
-local planter = "???";
 local planting = false;
 local bombsite = "???";
 local plantingStarted = 0;
@@ -51,7 +50,6 @@ end
 function EventHook(Event)
 if Event:GetName() == "bomb_beginplant" then 
 display = true
-planter = client.GetPlayerNameByUserID(Event:GetInt("userid")) 
 plantingStarted = globals.CurTime() 
 bombsite = sitename(entities.GetByIndex(Event:GetInt("site")))
 planting = true 
@@ -133,7 +131,7 @@ if not string.find(bombtimer, "%.") then
 bombtimer = bombtimer .. ".0"
 end
 draw.Text(PosX+125, PosY+4, bombtimer .. "s")
-draw.Color(2,123,253,255);
+draw.Color(23,114,69,255);
 if Bomb:GetProp("m_flDefuseCountDown") > Bomb:GetProp("m_flC4Blow") then
 draw.Color(255, 0, 0, 255);
 end
