@@ -5,7 +5,7 @@ local function bad_argument(expression, name, expected)
     assert(type(expression) == expected, " bad argument #1 to '%s' (%s expected, got %s)", 4, name, expected, tostring(type(expression)))
 end
 
-function renderer.circle_outline(x, y, r, g, b, a, radius, start_degrees, percentage, thickness, radian)
+function circle_outline(x, y, r, g, b, a, radius, start_degrees, percentage, thickness, radian)
     bad_argument(x and y and radius and start_degrees and percentage and thickness, "circle_outline", "number")
 
     local thickness = radius - thickness
@@ -97,7 +97,7 @@ local function Draw()
             local alpha = i / 5 * alpha[index]
 			
 			if psx == nil and psy == nil or psx < 100 or psy < 100 or psx > screen_size_x+500 or psy > screen_size_y+100 or not OOV_always:GetValue() then					
-            renderer.circle_outline(
+            circle_outline(
                 screen_size_x,
                 screen_size_y,
                 r,
@@ -109,7 +109,7 @@ local function Draw()
                 0.075 + (i * 0.00005),
                 (i * 2)
             )
-			renderer.circle_outline(
+			circle_outline(
                 screen_size_x,
                 screen_size_y,
                 r,
