@@ -1,5 +1,31 @@
 -- Bomb Info Panel by thekorol and contributors
 
+-- optimization, locals are faster than globals
+-- https://lua-users.org/wiki/OptimisingUsingLocalVariables
+local math_exp = math.exp
+local math_floor = math.floor
+local tonumber = tonumber
+local unpack = unpack
+local string_format = string.format
+local input_IsButtonDown = input.IsButtonDown
+local input_IsButtonPressed = input.IsButtonPressed
+local input_GetMousePos = input.GetMousePos
+local client_GetConVar = client.GetConVar
+local engine_TraceLine = engine.TraceLine
+local vector_Multiply = vector.Multiply
+local vector_Add = vector.Add
+local vector_Distance = vector.Distance
+local draw_Color = draw.Color
+local draw_Text = draw.Text
+local draw_FilledRect = draw.FilledRect
+local draw_GetTextSize = draw.GetTextSize
+local draw_SetFont = draw.SetFont
+local globals_CurTime = globals.CurTime
+local entities_FindByClass = entities.FindByClass
+local entities_GetByIndex = entities.GetByIndex
+local entities_GetLocalPlayer = entities.GetLocalPlayer
+
+
 local printPrefix = "[Bomb Info] "
 
 local refMenu = gui.Reference("Menu")
@@ -14,14 +40,6 @@ settingPanelY:SetInvisible(true)
 local colorT = { 255, 192, 0, 255 }
 local colorCT = { 0, 192, 255, 255 }
 local colorDamage = { 255, 0, 0, 255 }
-
--- optimization, locals are faster than globals
--- https://lua-users.org/wiki/OptimisingUsingLocalVariables
-local math_exp = math.exp
-local math_floor = math.floor
-local tonumber = tonumber
-local unpack = unpack
-local string_format = string.format
 
 -- https://lua-users.org/wiki/BaseSixtyFour
 local function DecodeBase64(data)
@@ -58,9 +76,9 @@ local stratum2Bold = [[T1RUTwALAIAAAwAwQ0ZGIP4O7K4AAAg4AAAxskdQT1PT/euMAABAPAAAA
 draw.AddFontResource(DecodeBase64(stratum2Bold))
 
 local font = draw.CreateFont("StratumNo2", 24, 800)
-draw.SetFont(font)
+draw_SetFont(font)
 
-local _, fontHeight = draw.GetTextSize("A")
+local _, fontHeight = draw_GetTextSize("A")
 fontHeight = fontHeight + 1 -- fix
 local padding = 5
 local panelW = 0
@@ -68,12 +86,12 @@ local oneLineH = fontHeight + padding * 2
 local twoLinesH = fontHeight * 2 + padding * 3
 local panelH = oneLineH
 local barH = 3
-local siteW = draw.GetTextSize("Site: ")
-local hpW = draw.GetTextSize("HP: ")
+local siteW = draw_GetTextSize("Site: ")
+local hpW = draw_GetTextSize("HP: ")
 local plantLength = 3.125
-local plantingW = draw.GetTextSize(string_format("Planting: %.0f.0", plantLength)) -- font isn't monotype so make space for zero
-local defusingW = draw.GetTextSize("Defusing: 10.0")
-local noTimeW = draw.GetTextSize("Defusing: No Time")
+local plantingW = draw_GetTextSize(string_format("Planting: %.0f.0", plantLength)) -- font isn't monotype so make space for zero
+local defusingW = draw_GetTextSize("Defusing: 10.0")
+local noTimeW = draw_GetTextSize("Defusing: No Time")
 
 local plantTime = -1
 local bombsiteName = "?"
@@ -94,7 +112,7 @@ local isDragging = false
 local dragPrevX, dragPrevY = 0, 0
 
 local function Drag()
-	if not (isDragging and input.IsButtonDown(1)) and not input.IsButtonPressed(1) then
+	if not (isDragging and input_IsButtonDown(1)) and not input_IsButtonPressed(1) then
 		isDragging = false
 		return
 	end
@@ -102,7 +120,7 @@ local function Drag()
 	local panelX = tonumber(settingPanelX:GetValue())
 	local panelY = tonumber(settingPanelY:GetValue())
 
-	local mouseX, mouseY = input.GetMousePos()
+	local mouseX, mouseY = input_GetMousePos()
 
 	if isDragging then
 		settingPanelX:SetValue(panelX + (mouseX - dragPrevX))
@@ -123,8 +141,8 @@ end
 
 -- aka Demolition
 local function IsPlayingGunGameTRBomb()
-	local game_type = tonumber(client.GetConVar("game_type"))
-	local game_mode = tonumber(client.GetConVar("game_mode"))
+	local game_type = tonumber(client_GetConVar("game_type"))
+	local game_mode = tonumber(client_GetConVar("game_mode"))
 	return game_type == 1 and game_mode == 1
 end
 
@@ -235,7 +253,7 @@ local function CalcBombDamage(bomb, localPlayer)
 	local bombOrigin = bomb:GetAbsOrigin()
 	bombOrigin = { bombOrigin["x"], bombOrigin["y"], bombOrigin["z"] }
 
-	local tr = engine.TraceLine(
+	local tr = engine_TraceLine(
 		Vector3(bombOrigin[1], bombOrigin[2], bombOrigin[3] + 8),
 		Vector3(bombOrigin[1], bombOrigin[2], bombOrigin[3] - 32),
 		MASK_SOLID
@@ -247,12 +265,12 @@ local function CalcBombDamage(bomb, localPlayer)
 		local planeNormal = tr["plane"]["normal"]
 		planeNormal = { planeNormal["x"], planeNormal["y"], planeNormal["z"] }
 
-		local normalMultiplied = { vector.Multiply(planeNormal, 0.6) }
+		local normalMultiplied = { vector_Multiply(planeNormal, 0.6) }
 
 		local endpos = tr["endpos"]
 		endpos = { endpos["x"], endpos["y"], endpos["z"] }
 
-		bombOrigin = { vector.Add(endpos, normalMultiplied) }
+		bombOrigin = { vector_Add(endpos, normalMultiplied) }
 	end
 
 	local bombDamage = 0
@@ -275,7 +293,7 @@ local function CalcBombDamage(bomb, localPlayer)
 	-- https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/server/player.cpp#L7120
 	vecSpot = { vecSpot["x"], vecSpot["y"], vecSpot["z"] + (viewOffsetZ * 0.85) }
 
-	local fDist = vector.Distance(vecSpot, bombOrigin)
+	local fDist = vector_Distance(vecSpot, bombOrigin)
 	local fSigma = bombRadius / 3.0
 	local fGaussianFalloff = math_exp(-fDist * fDist / (2.0 * fSigma * fSigma))
 	local flAdjustedDamage = bombDamage * fGaussianFalloff
@@ -292,22 +310,22 @@ local function CalcBombDamage(bomb, localPlayer)
 end
 
 local function DrawBackground(x, y, w, h, color)
-	draw.Color(unpack(color))
-	draw.FilledRect(x, y, x + w, y + h)
+	draw_Color(unpack(color))
+	draw_FilledRect(x, y, x + w, y + h)
 end
 
 local function DrawBar(x, y, w, h, ratio, color)
-	draw.Color(unpack(color))
+	draw_Color(unpack(color))
 	local barRight = x + (w * ratio)
-	draw.FilledRect(x, y, barRight, y + h)
+	draw_FilledRect(x, y, barRight, y + h)
 end
 
 local function DrawSite(x, y, colorText, colorSite)
-	draw.Color(unpack(colorText))
-	draw.Text(x, y, "Site:")
+	draw_Color(unpack(colorText))
+	draw_Text(x, y, "Site:")
 
-	draw.Color(unpack(colorSite))
-	draw.Text(x + siteW, y, bombsiteName)
+	draw_Color(unpack(colorSite))
+	draw_Text(x + siteW, y, bombsiteName)
 end
 
 local function DrawPlanting(plantTime, plantLength, curTime, panelX, panelY, panelW, panelH, barH, textX, textY, colorStart, colorEnd)
@@ -316,13 +334,13 @@ local function DrawPlanting(plantTime, plantLength, curTime, panelX, panelY, pan
 
 	local plantColor = ArrayLerp(colorStart, colorEnd, plantRatio)
 
-	draw.Color(unpack(colorStart))
-	draw.Text(textX - plantingW, textY, "Planting:")
+	draw_Color(unpack(colorStart))
+	draw_Text(textX - plantingW, textY, "Planting:")
 
-	draw.Color(unpack(plantColor))
+	draw_Color(unpack(plantColor))
 	local text = string_format("%.1f", plantCountdown)
-	local textW = draw.GetTextSize(text)
-	draw.Text(textX - textW, textY, text)
+	local textW = draw_GetTextSize(text)
+	draw_Text(textX - textW, textY, text)
 
 	DrawBar(panelX, panelY + panelH, panelW, barH, plantRatio, plantColor)
 end
@@ -346,11 +364,11 @@ local function DrawHP(bomb, localPlayer, x, y, colorMin, colorMax)
 
 	local hpLeftColor = ArrayLerp(colorMin, colorMax, hpLeftRatio)
 
-	draw.Color(unpack(colorMax))
-	draw.Text(x, y, "HP:")
+	draw_Color(unpack(colorMax))
+	draw_Text(x, y, "HP:")
 
-	draw.Color(unpack(hpLeftColor))
-	draw.Text(x + hpW, y, hpLeft)
+	draw_Color(unpack(hpLeftColor))
+	draw_Text(x + hpW, y, hpLeft)
 end
 
 local function DrawBlow(blowTime, timerLength, curTime, panelX, panelY, panelW, panelH, barH, textX, textY, colorStart, colorEnd)
@@ -359,10 +377,10 @@ local function DrawBlow(blowTime, timerLength, curTime, panelX, panelY, panelW, 
 
 	local blowColor = ArrayLerp(colorStart, colorEnd, blowColorRatio)
 
-	draw.Color(unpack(blowColor))
+	draw_Color(unpack(blowColor))
 	local text = string_format("%.1f", blowCountdown)
-	local textW = draw.GetTextSize(text)
-	draw.Text(textX - textW, textY, text)
+	local textW = draw_GetTextSize(text)
+	draw_Text(textX - textW, textY, text)
 
 	local blowRatio = clamp(blowCountdown / timerLength, 0, 1)
 
@@ -388,16 +406,16 @@ local function DrawDefusing(bomb, defuser, blowTime, timerLength, curTime, panel
 
 		local defuseColor = ArrayLerp(colorStart, colorEnd, defuseRatio)
 
-		draw.Color(unpack(colorStart))
-		draw.Text(textX - defusingW, textY, "Defusing:")
+		draw_Color(unpack(colorStart))
+		draw_Text(textX - defusingW, textY, "Defusing:")
 
-		draw.Color(unpack(defuseColor))
+		draw_Color(unpack(defuseColor))
 		local text = string_format("%.1f", defuseCountdown)
-		local textW = draw.GetTextSize(text)
-		draw.Text(textX - textW, textY, text)
+		local textW = draw_GetTextSize(text)
+		draw_Text(textX - textW, textY, text)
 	else
-		draw.Color(unpack(colorNoTime))
-		draw.Text(textX - noTimeW, textY, "Defusing: No Time")
+		draw_Color(unpack(colorNoTime))
+		draw_Text(textX - noTimeW, textY, "Defusing: No Time")
 	end
 
 	local defuseBarRatio = clamp(defuseCountdown / timerLength, 0, 1)
@@ -409,13 +427,13 @@ local function DrawPanel()
 	local panelX = tonumber(settingPanelX:GetValue())
 	local panelY = tonumber(settingPanelY:GetValue())
 
-	local curTime = globals.CurTime()
+	local curTime = globals_CurTime()
 
 	local blowTime = -1
 	local localPlayer = nil
 	local defuser = nil
 
-	local bomb = entities.FindByClass("CPlantedC4")[1]
+	local bomb = entities_FindByClass("CPlantedC4")[1]
 	if bomb then
 		-- sometimes the panel continues to get drawn when round finishes with a planted bomb
 		-- i assume it happens due to dormancy
@@ -432,7 +450,7 @@ local function DrawPanel()
 			return
 		end
 
-		localPlayer = entities.GetLocalPlayer()
+		localPlayer = entities_GetLocalPlayer()
 		defuser = bomb:GetPropInt("m_hBombDefuser")
 
 		if (localPlayer and localPlayer:IsAlive()) or defuser ~= -1 then
@@ -460,7 +478,7 @@ local function DrawPanel()
 	local colorBG = { settingBGColor:GetValue() }
 	local colorFG = { settingFGColor:GetValue() }
 
-	draw.SetFont(font)
+	draw_SetFont(font)
 
 	DrawBackground(panelX, panelY, panelW, panelH, colorBG)
 
@@ -512,8 +530,8 @@ local function GetBombsiteName(siteEntity)
 	local b = playerResources:GetPropVector("m_bombsiteCenterB")
 	b = { b["x"], b["y"], b["z"] }
 
-	local distToA = vector.Distance(center, a)
-	local distToB = vector.Distance(center, b)
+	local distToA = vector_Distance(center, a)
+	local distToB = vector_Distance(center, b)
 
 	return distToA > distToB and "B" or "A"
 end
@@ -538,8 +556,8 @@ callbacks.Register("FireGameEvent", function(event)
 		bombsiteName = "?"
 
 	elseif eventName == "bomb_beginplant" then
-		plantTime = globals.CurTime() + plantLength
-		bombsiteName = GetBombsiteName(entities.GetByIndex(event:GetInt("site")))
+		plantTime = globals_CurTime() + plantLength
+		bombsiteName = GetBombsiteName(entities_GetByIndex(event:GetInt("site")))
 
 	elseif eventName == "bomb_planted" then
 		plantTime = -1
